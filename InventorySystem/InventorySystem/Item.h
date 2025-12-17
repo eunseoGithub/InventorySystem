@@ -20,4 +20,3 @@ private:
 	string name;
 	int price;
 };
-

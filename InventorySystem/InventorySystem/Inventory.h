@@ -1,6 +1,6 @@
 #pragma once
 #include<iostream>
-#include"Item.h"
+#include<algorithm>
 using namespace std;
 
 template<typename T>
@@ -17,6 +17,17 @@ public:
 		pItems = new T[capacity];
 		size = 0;
 	}
+	Inventory(const Inventory<T>& other)
+	{
+		capacity = other.capacity;
+		size = other.size;
+		pItems = new T[capacity];
+		for (int i = 0; i < size; i++)
+		{
+			pItems[i] = other.pItems[i];
+		}
+		cout << "Inventory Copy Finish" << endl;
+	}
 	~Inventory()
 	{
 		if (pItems != nullptr)
@@ -26,15 +37,15 @@ public:
 
 	void AddItem(const T& item)
 	{
-		if (size < capacity)
+		if(size >= capacity)
 		{
-			pItems[size] = item;
-			size++;
+			cout << "Inventory size Up!" << endl;
+			Resize(capacity * 2);
+			
 		}
-		else
-		{
-			cout << "Inventory is full!" << endl;
-		}
+		pItems[size] = item;
+		size++;
+		cout <<"AddItem : " << item.getName() << ", [" << item.GetPrice() << "G]" << endl;
 	}
 	void RemoveLastItem()
 	{
@@ -62,7 +73,38 @@ public:
 			pItems[i].PrintInfo();
 		}
 	}
+	void Assign(const Inventory<T>& other)
+	{
+		if (this == &other)
+			return;
 
+		T* newItems = new T[other.capacity];
+
+		copy(other.pItems, other.pItems + other.size, newItems);
+
+		delete[] pItems;
+
+		pItems = newItems;
+		capacity = other.capacity;
+		size = other.size;
+	}
+	void Resize(int newCapacity)
+	{
+		T* tmp = new T[newCapacity];
+		copy(pItems, pItems + capacity, tmp);
+		
+		delete[] pItems;
+		pItems = tmp;
+		
+		capacity = newCapacity;
+	}
+	void SortItems()
+	{
+		sort(pItems, pItems + size, [](const T& a, const T& b)
+			{
+				return a.GetPrice() < b.GetPrice();
+			});
+	}
 private:
 	T* pItems;
 	int capacity;
